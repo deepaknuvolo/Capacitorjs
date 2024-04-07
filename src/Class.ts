@@ -22,7 +22,7 @@ export const UserUpgradeStatements = [
     */
 ]
 
-export interface Todo {
+export interface ITodo {
     id:number,
     todoTitle:string,
     todoDesc:string
@@ -112,7 +112,7 @@ export class SQLiteService {
         }
       }
       // Adding, Updating and Deleting Todos
-      async addTodo(todoDetails:Todo){
+      async addTodo(todoDetails:ITodo){
         const sql = ' INSERT INTO todos (todo, desc) VALUES (?,?)';
         const res = await this.db.run(sql,[todoDetails.todoTitle,todoDetails.todoDesc]);
         console.log(res);
@@ -122,7 +122,7 @@ export class SQLiteService {
             throw new Error('SQLiteService.addUser Error')
         }        
       }
-      async getTodo():Promise<Todo[]>{
+      async getTodo():Promise<ITodo[]>{
         const array = await this.db.query('SELECT * FROM todos')
         console.log(array.values);
       }

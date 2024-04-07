@@ -1,10 +1,10 @@
-import { useContext, useEffect, useState } from 'react'
+import { ReactElement, useContext, useEffect, useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 import { Capacitor } from '@capacitor/core'
 import { SQLiteServe } from './main'
-
+import {ITodo} from './Class.ts'
 
 function InitializeApp(SQLiteServeOb){
  let pin = false;
@@ -33,38 +33,43 @@ function InitializeApp(SQLiteServeOb){
     
  }
 
-function App() {
-  const [count, setCount] = useState("")
+function App():ReactElement {
+  const [TodoList, setTodoList] = useState<ITodo[]>([]);
   const SQLiteServeC = useContext(SQLiteServe);
   const ready = InitializeApp(SQLiteServeC);
   useEffect(()=>{
     ready();
   },[])
+  async function handleSubmit(e){
+    e.preventDefault();
+    const Todo: ITodo ={
+      todoDesc:e.target[1].value,
+      todoTitle:e.target[0].value
+    };
+    let lastId = await SQLiteServeC.addTodo(Todo);
+    Todo.id = lastId;
+    setTodoList(prev => [...prev,Todo]);
+  }
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <form onSubmit={handleSubmit}>
+        <label htmlFor="todoTitle">
+          Todo Title: <input type="text" id="todoTitle" />
+        </label>
+        <label htmlFor="todoDesc">
+          Todo Description: <input type="text" id="todoDesc" />
+        </label>
+        <button>Submit</button>
+      </form>
+      <div className="TodoDisp">
+        <h3>Todo Display</h3>
+        {TodoList.length>0?TodoList.map(elem=>{
+          return(<div className='todoElem' key={elem.id}>
+            <h4 className="title">{elem.todoTitle}</h4>
+            <span>{elem.todoDesc}</span>
+          </div>)
+        }):""}
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => {
-          SQLiteServeC.addTodo({todoDesc:"Test Description", todoTitle:"test title"});
-          SQLiteServeC.getTodo();
-        }}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
   )
 }
