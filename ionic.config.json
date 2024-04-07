@@ -1,0 +1,7 @@
+{
+  "name": "capacitorjs",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "custom"
+}
